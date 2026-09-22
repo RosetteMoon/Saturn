@@ -26,46 +26,27 @@ async function initScene(){
  const metal=new THREE.MeshPhysicalMaterial({color:0xb4bfca,metalness:1,roughness:.15,clearcoat:1,clearcoatRoughness:.09,envMapIntensity:1.3});
  // True extruded glyph geometry: 文 (글월 문), 讚 (기릴 찬), 美 (아름다울 미).
  const {FontLoader}=await import('three/addons/loaders/FontLoader.js');
- 
- const {mergeVertices}=await import('three/addons/utils/BufferGeometryUtils.js');
- const font=await new FontLoader().loadAsync('./fonts/moon-name.json?v=solid4');
- metal.roughness=.055;metal.envMapIntensity=1.65;metal.color.setHex(0xf0f3ff);
- const face=new THREE.MeshPhysicalMaterial({color:0xd8dfe9,metalness:1,roughness:.075,clearcoat:1,clearcoatRoughness:.025,envMapIntensity:1.55});
+ const font=await new FontLoader().loadAsync('./fonts/moon-name.json?v=fused9');
+ metal.roughness=.075;metal.envMapIntensity=1.55;metal.color.setHex(0xe5eaf3);
  // The material itself is opaque; screen blending and alpha masks must not reintroduce transparency.
- for(const material of [face,metal]){material.transparent=false;material.opacity=1;material.transmission=0;material.depthWrite=true;}
- function roundedPath(source,isShape){
-   const points=source.getPoints(14);
-   if(points[0].distanceTo(points.at(-1))<1e-7)points.pop();
-   const path=isShape?new THREE.Shape():new THREE.Path();
-   const corners=points.map((p,j)=>{
-     const prev=points[(j+points.length-1)%points.length],next=points[(j+1)%points.length];
-     const radius=Math.min(.034,p.distanceTo(prev)*.24,p.distanceTo(next)*.24);
-     return {p,a:p.clone().lerp(prev,radius/Math.max(p.distanceTo(prev),1e-8)),b:p.clone().lerp(next,radius/Math.max(p.distanceTo(next),1e-8))};
-   });
-   path.moveTo(corners[0].a.x,corners[0].a.y);
-   for(const c of corners){path.lineTo(c.a.x,c.a.y);path.quadraticCurveTo(c.p.x,c.p.y,c.b.x,c.b.y);}path.closePath();
-   return path;
- }
+ metal.transparent=false;metal.opacity=1;metal.transmission=0;metal.depthWrite=true;metal.side=THREE.DoubleSide;
  const letters=[];
  [...'文讚美'].forEach((char,i)=>{
    const letter=new THREE.Group();
-   const shapes=font.generateShapes(char,2.5).map(source=>{
-     const shape=roundedPath(source,true);shape.holes=source.holes.map(hole=>roundedPath(hole,false));return shape;
-   });
-   // Small lateral bevel preserves narrow counters; deeper axial rounding softens the rim.
-   let geometry=new THREE.ExtrudeGeometry(shapes,{depth:.46,curveSegments:8,steps:1,bevelEnabled:true,bevelThickness:.055,bevelSize:.010,bevelSegments:10});
-   geometry.deleteAttribute('normal');geometry.deleteAttribute('uv');
-   const welded=mergeVertices(geometry,1e-5);geometry.dispose();geometry=welded;geometry.computeVertexNormals();
+   // Use the font's already-unified contours directly. Keeping the generated split
+   // normals prevents front/side shading from bleeding across stroke junctions.
+   const shapes=font.generateShapes(char,2.5);
+   const geometry=new THREE.ExtrudeGeometry(shapes,{depth:.28,curveSegments:12,steps:1,bevelEnabled:true,bevelThickness:.032,bevelSize:.018,bevelSegments:6});
    geometry.computeBoundingBox();const box=geometry.boundingBox;
-   geometry.translate(-(box.max.x+box.min.x)/2,-(box.max.y+box.min.y)/2,-.135);
-   // One closed chrome solid per glyph, with true through-holes.
-   letter.add(new THREE.Mesh(geometry,[face,metal]));
+   geometry.translate(-(box.max.x+box.min.x)/2,-(box.max.y+box.min.y)/2,-.14);
+   // One material over the entire closed glyph reads as a single cast object.
+   letter.add(new THREE.Mesh(geometry,metal));
 
    letter.position.set((i-1)*2.68,[.20,0,-.14][i],i===1?.15:0);
-   letter.rotation.set([-.06,.04,-.08][i],[.12,-.10,.10][i],0);
+   letter.rotation.set([-.018,.012,-.022][i],[.045,-.035,.04][i],0);
    sculpture.add(letter);letters.push(letter);
  });
- sculpture.rotation.set(.10,-.20,-.10);
+ sculpture.rotation.set(.045,-.085,-.055);
  const rim=new THREE.PointLight(0xc8e7d5,35,20);rim.position.set(3,2,4);scene.add(rim);
  const composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.24,.5,1.15);composer.addPass(bloom);composer.addPass(new OutputPass());
  function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);composer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();sculpture.scale.setScalar((2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z*camera.aspect)/6.35);}new ResizeObserver(resize).observe(host);resize();
