@@ -9,6 +9,36 @@ document.querySelector('#contact-link').href=`mailto:${profile.email}`;
 document.querySelector('#email-label').textContent=profile.email;
 document.querySelector('#year').textContent=new Date().getFullYear();
 function clock(){document.querySelector('#clock').textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());}clock();setInterval(clock,60000);
+const playlist=[
+ {title:'Dark Carol Music Box',src:'./audio/dark-carol-music-box.mp3'},
+ {title:'Lunar Wish (Cover)',src:'./audio/lunar-wish-cover.mp3'}
+];
+const audio=document.querySelector('#soundtrack-audio'),soundtrack=document.querySelector('.soundtrack'),trackTitle=document.querySelector('#track-title'),trackNumber=document.querySelector('#track-number'),soundToggle=document.querySelector('#sound-toggle'),soundNext=document.querySelector('#sound-next'),soundStatus=document.querySelector('#soundtrack-status');
+const soundGate=document.querySelector('.sound-gate'),enterWithSound=document.querySelector('#enter-with-sound'),enterSilent=document.querySelector('#enter-silent');
+const gatedContent=[document.querySelector('.skip'),document.querySelector('header'),document.querySelector('main'),document.querySelector('footer'),soundtrack];gatedContent.forEach(element=>{element.inert=true;});
+let trackIndex=0;
+audio.volume=.34;
+function soundtrackUI(state,message=''){
+ soundtrack.dataset.state=state;soundStatus.textContent=message;
+ const playing=state==='playing';soundToggle.textContent=playing?'PAUSE':'PLAY';soundToggle.setAttribute('aria-label',playing?'배경 음악 일시정지':'배경 음악 재생');
+}
+function loadTrack(index,shouldPlay=false){
+ trackIndex=(index+playlist.length)%playlist.length;const track=playlist[trackIndex];
+ audio.src=track.src;trackTitle.textContent=track.title;trackNumber.textContent=`0${trackIndex+1} / 0${playlist.length}`;audio.load();
+ soundtrackUI('loading','음악을 불러오는 중입니다.');if(shouldPlay)playSoundtrack();
+}
+async function playSoundtrack(){
+ try{await audio.play();soundtrackUI('playing',`${playlist[trackIndex].title} 재생 중`);return true;}
+ catch(error){soundtrackUI('blocked','PLAY를 눌러 음악을 시작해 주세요.');return false;}
+}
+function closeSoundGate(){soundGate.classList.add('is-leaving');document.body.classList.remove('sound-gated');gatedContent.forEach(element=>{element.inert=false;});setTimeout(()=>{soundGate.hidden=true;},650);}
+enterWithSound.addEventListener('click',async()=>{if(await playSoundtrack())closeSoundGate();});
+enterSilent.addEventListener('click',()=>{audio.pause();soundtrackUI('paused','음악 없이 입장했습니다.');closeSoundGate();});
+soundToggle.addEventListener('click',()=>{if(audio.paused)playSoundtrack();else{audio.pause();soundtrackUI('paused','음악이 일시정지되었습니다.');}});
+soundNext.addEventListener('click',()=>loadTrack(trackIndex+1,true));
+audio.addEventListener('ended',()=>loadTrack(trackIndex+1,true));
+audio.addEventListener('error',()=>soundtrackUI('error','음악 파일을 불러오지 못했습니다.'));
+loadTrack(0);soundtrackUI('paused','ENTER WITH SOUND를 눌러 음악을 시작해 주세요.');enterWithSound.focus();
 const dialog=document.querySelector('dialog');let opener;
 document.querySelectorAll('.project').forEach(button=>button.addEventListener('click',()=>{opener=button;const p=projects[Number(button.dataset.project)];document.querySelector('#dialog-title').textContent=p.title;document.querySelector('#dialog-category').textContent=p.category;document.querySelector('#dialog-description').textContent=p.description;document.querySelector('#dialog-year').textContent=p.year;document.querySelector('#dialog-art').replaceChildren(button.querySelector('.project-art').cloneNode(true));dialog.showModal();document.body.classList.add('modal-open');}));
 document.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});dialog.addEventListener('close',()=>{document.body.classList.remove('modal-open');opener?.focus();});

@@ -4,12 +4,31 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MOON — Independent Creative Portfolio</title><meta name="description" content="경계를 넘어, 감각을 만드는 디지털 포트폴리오. 디자인, 인터랙션, 그리고 새로운 경험.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101012'/%3E%3Cpath d='M6 24V8l10 10L26 8v16' fill='none' stroke='%23dfff80' stroke-width='3'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="./style.css?v=restored8">
+<link rel="stylesheet" href="./style.css?v=sound11">
+<link rel="stylesheet" href="./sound-gate.css?v=gate12">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
+<style>.soundtrack{right:50%;transform:translateX(50%)}.soundtrack-actions button,.sound-gate-actions button{font-size:11px}@media(max-width:760px){.soundtrack{right:16px;transform:none}}</style>
 </head>
-<body>
+<body class="sound-gated">
 <a class="skip" href="#work">작업으로 바로 가기</a>
+<div class="sound-gate" role="dialog" aria-modal="true" aria-labelledby="sound-gate-title" aria-describedby="sound-gate-copy">
+<div class="sound-gate-chrome" aria-hidden="true"><span>文</span><span>讚</span><span>美</span></div>
+<div class="sound-gate-content">
+<span class="sound-gate-kicker">MOON — PORTFOLIO VOL. 01</span>
+<h2 id="sound-gate-title">ENTER THE<br><em>ATMOSPHERE.</em></h2>
+<p id="sound-gate-copy">이 포트폴리오는 사운드와 함께 완성됩니다.<br>두 곡이 순서대로 이어집니다.</p>
+<div class="sound-gate-actions"><button id="enter-with-sound" type="button"><span>ENTER WITH SOUND</span><b>↗</b></button><button id="enter-silent" type="button">CONTINUE SILENTLY</button></div>
+</div>
+<span class="sound-gate-index" aria-hidden="true">SOUND<br>01—02</span>
+</div>
 <header><a class="brand" href="#home" aria-label="MOON 홈">m<span>oo</span>n<span class="brand-star">✳</span></a><nav aria-label="메인 메뉴"><a href="#work">WORK <sup>03</sup></a><a href="#about">ABOUT</a><a href="#contact">CONTACT <span>↗</span></a></nav><span class="header-note">INDEPENDENT<br>DESIGNER & CREATIVE</span></header>
+<audio id="soundtrack-audio" preload="auto" playsinline></audio>
+<aside class="soundtrack" data-state="loading" aria-label="배경 음악 플레이어">
+<div class="soundtrack-signal" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="soundtrack-copy"><span>NOW PLAYING <b id="track-number">01 / 02</b></span><strong id="track-title">Dark Carol Music Box</strong></div>
+<div class="soundtrack-actions"><button id="sound-toggle" type="button" aria-label="배경 음악 재생">PLAY</button><button id="sound-next" type="button" aria-label="다음 곡 재생">NEXT</button></div>
+<span class="soundtrack-status" id="soundtrack-status" aria-live="polite"></span>
+</aside>
 <main>
 <section id="home" class="hero" aria-labelledby="hero-title">
 <div class="hero-grid" aria-hidden="true"></div><div class="ambient" aria-hidden="true"></div><div id="scene" role="img" aria-label="문찬미의 한자 文讚美를 입체로 만든 크롬 조형물. 글월 문, 기릴 찬, 아름다울 미."></div>
@@ -31,5 +50,5 @@
 <section id="contact" class="contact section"><span class="eyebrow">03 / HAVE SOMETHING IN MIND?</span><a href="mailto:hello@example.com" id="contact-link">LET’S MAKE<br><em>CONTACT.</em><span>↗</span></a><div class="contact-bottom"><span>새로운 아이디어는 대화에서 시작됩니다.</span><span id="email-label">hello@example.com</span></div><p class="sample-note">연락처는 샘플입니다. 공개 전 실제 이메일로 변경해 주세요.</p></section>
 </main><footer><a class="brand" href="#home">moon✳</a><span>© <span id="year"></span> MOON. ALL RIGHTS RESERVED.</span><a href="#home">BACK TO TOP ↑</a></footer>
 <dialog id="project-dialog" aria-labelledby="dialog-title"><button class="dialog-close" aria-label="프로젝트 닫기">닫기 ×</button><span class="eyebrow" id="dialog-category"></span><h2 id="dialog-title"></h2><div id="dialog-art" class="dialog-art"></div><p id="dialog-description"></p><div class="dialog-meta"><span>CONCEPT PROJECT</span><span id="dialog-year"></span></div></dialog>
-<script type="module" src="./main.js?v=fused10"></script>
+<script type="module" src="./main.js?v=gate13"></script>
 </body></html>
